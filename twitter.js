@@ -7,7 +7,7 @@ var http = require('http');
 
 // Starting with no requests and bunny default, over
 var requested_list = [];
-var default_list = [{id: "GVFWai1jVfs", time: "43"}, {id: "TbWKGO73Kds", time: "49"}];
+var default_list = [{id: "GVFWai1jVfs", time: "43", title:"default1"}, {id: "TbWKGO73Kds", time: "49", title:"default2"}];
 
 //Connection to twitter
 var T = new Twit({
@@ -89,7 +89,8 @@ function ytSearch(songName, dataFun) {
       while (item = stream.read()){
         var vID = item.guid.substr(item.guid.lastIndexOf(":") + 1);
         var vTime = item['media:group']['yt:duration']['@'].seconds;
-        var val = ({id: vID, time: vTime});
+        var vTitle = item['media:group']['media:title']['#'];
+        var val = ({id: vID, time: vTime, title: vTitle});
         dataFun(val);
       }
     });

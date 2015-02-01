@@ -4,6 +4,7 @@ var server = app.listen(3000);
 var io = require('socket.io').listen(server);
 exports.io = io;
 
+
 console.log('app started on port ' + server.address().port);
 
 //Configuration
@@ -26,5 +27,10 @@ app.all('*', function(req, res, next) {
   	next();
 });
 
-var twitter = require('./twitter');
+var selected_default = "";
+if(process.argv.length > 2) {
+	selected_default = process.argv[2];
+}
+exports.selected_default = selected_default;
 
+var twitter = require('./twitter');

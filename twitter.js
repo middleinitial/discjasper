@@ -9,6 +9,7 @@ var selected_default = require('./app').selected_default;
 var current_song;
 var requested_list = [];
 var default_list = [{id: "GVFWai1jVfs", time: "43", title: "30 Second Bunnies: Terminator"}];
+var shuffle = false;
 
 //Connection to twitter
 var T = new Twit({
@@ -75,11 +76,17 @@ io.sockets.on('connection', function (socket) {
     sendLoadPlaylist();
   });
   
-  socket.on('set_selected_default', function(data) {
-	selected_default = data;
+  socket.on('shuffle_status', function(data) {
+    setShuffle();
   });
-
+  
+  
 });
+
+function setShuffle() {
+  if(shuffle){ shuffle = false; }
+  else { shuffle = true; }
+}
 
 function playNext() {
   if (requested_list.length > 0) {
@@ -95,7 +102,11 @@ function sendLoadPlaylist() {
 }
 
 function sendDefault() {
-  current_song = default_list.shift();
+  if(shuffle) {
+	current_song = default_list[Math.floor(Math.random()*default_list.length)];
+  }else {
+	current_song = default_list.shift();
+  }
   io.sockets.emit('next_song', current_song);
   default_list.push(current_song);
 }

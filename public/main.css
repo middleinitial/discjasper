@@ -69,6 +69,18 @@ body.player {
     font-size: 28px;
     cursor: pointer;
     border-right: 1px solid black; }
+  .toolbar .shufflePlaylist:after {
+    box-sizing: border-box;
+    content: "\f074";
+    background: orange;
+    padding: 7px 0 0 8px;
+    float: left;
+    width: 45px;
+    height: 45px;
+    font-size: 28px;
+    cursor: pointer;
+    border-right: 1px solid black; 
+    opacity: 1;}
   .toolbar .searchSong:after {
     box-sizing: border-box;
     content: "\f00e";

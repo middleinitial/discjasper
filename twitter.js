@@ -26,14 +26,8 @@ function sendLoadPlaylist() {
   io.sockets.emit('get_selected_default');    
 }
 
-if(selected_default.length > 0) {
-	default_list = require('./setPlaylist').setPlaylist(selected_default);
-	if(default_list.length == 0){
-		billboardDefault();
-	}
-}else {
-	billboardDefault();
-}
+fillDefault();
+
 //Connection to the browser
 io.sockets.on('connection', function (socket) {
 
@@ -120,6 +114,9 @@ function activePlaylist() {
   if (requested_list.length > 0) {
     return requested_list;
   } else {
+	if(default_list.length == 0) {
+		fillDefault();
+	}
     return default_list;
   }
 }
@@ -138,6 +135,17 @@ stream.on('tweet', function(tweet) {
 
   }
 });
+
+function fillDefault() {
+	if(selected_default.length > 0) {
+		default_list = require('./setPlaylist').setPlaylist(selected_default);
+		if(default_list.length == 0){
+			billboardDefault();
+		}
+	}else {
+		billboardDefault();
+	}
+}
 
 // PRIMARY DATA SOURCES
 function billboardDefault() {

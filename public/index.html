@@ -21,7 +21,7 @@
       });
 
       function playVideo(obj) {
-        $(".yt").html('<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' + obj.id + '?autoplay=1&fs=1" frameborder="0" allowfullscreen></iframe>');
+        $(".yt").html('<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' + obj.id + '?autoplay=1&fs=1&iv_load_policy=3" frameborder="0" allowfullscreen></iframe>');
         videoTime = setTimeout("findNext()", (parseInt(obj.time)+1)*1000);
       }
 

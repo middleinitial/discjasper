@@ -44,7 +44,7 @@ body.player {
       width: 100%;
       padding: 14px 15px 13px;
       border: 0; }
-  .searchbar .addSong:after {
+  .searchbar .addSong:after, .toolbar .addSong:after {
     box-sizing: border-box;
     content: "\f0fe";
     background: #89CC4A;
@@ -55,7 +55,18 @@ body.player {
     height: 44px;
     font-size: 28px;
     cursor: pointer; }
-
+  .searchbar .searchSong:after {
+	box-sizing: border-box;
+    content: "\f00e";
+    background: orange;
+    padding: 7px 0 0 12px;
+    position: absolute;
+    right: 0;
+    width: 45px;
+    height: 44px;
+    font-size: 28px;
+    cursor: pointer; }
+   
 .toolbar {
   height: 45px; }
   .toolbar .skipSong:after {

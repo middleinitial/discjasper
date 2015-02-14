@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0, maximum-scale=1, user-scalable=0">
+		<title>Create Playlist</title>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	
+	<body>
+
+		<div class="searchbar" id="searchToolbar">
+			<div class="searchSong icon"></div>
+			<form class="searchBox">
+				<input id="searchText" type="text" />
+			</form>
+		</div>
+		
+		<div class="toolbar" id="selectToolbar" style="display: none;">
+			<div class="skipSong icon"></div>
+			<div class="addSong icon"></div>
+			<div class="currentSongName"></div>
+		</div>
+		
+		<div id="ytPlayer" style="display: none;"></div>
+		
+		<div id=saveBar class="searchbar" style="display: none;">
+			<div class="savePl icon"></div>
+			<form id="playlistName" class="searchBox">
+				<input type="text"/>
+			</form>
+		</div>
+		
+		<div id="plist">
+		</div>
+		
+		<script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+		<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
+		<script src="/jquery-ui.min.js"></script>
+		<script src="/jquery.ui.touch-punch.min.js"></script>
+		<script>
+			var socket = io.connect("http://"+location.hostname+":"+location.port);
+	
+			var searchResults = [];
+			var current_song;
+
+			//Search Bar. needs to get result and begin play back 
+
+			$(".searchSong").click( function() {
+				searchSong(); 
+			});
+
+			$(".searchBox").submit(function (e){
+				e.preventDefault();
+				searchSong(); 
+			});
+			
+			//Select Bar. needs to skip to next yt result or add to list
+			
+			$(".skipSong").click( function () {
+				playSong();
+			});
+			
+			$(".addSong").click( function() {
+				addSong();
+			});
+		
+			//Save Bar.
+			$(".savePl").click( function() {
+				save(); 
+			});
+
+			$(".playlistName").submit(function (e){
+				e.preventDefault();
+				save(); 
+			});
+		
+			//plist. needs to be able to reorder and trash
+			$("#plist").sortable({
+				axis: "y",
+				handle: ".handle",
+				containment: "document", 
+				tolerance: "pointer",
+			});
+			
+			$("#plist").on("click",".trash", function(e) {
+				$(this).parent().remove();
+			});
+			
+			socket.on('searchTopFiveResults', function (obj) {
+				searchResults.push(obj);
+				if(searchResults.length == 5) {
+					playSong();
+				}
+			});
+			
+			
+			function searchSong() {
+				var searchQuerry = $("#searchToolbar input").val();
+				$("#searchToolbar input").val("");
+				searchResults = [];
+				socket.emit("searchTopFive",{q: searchQuerry});
+				searchIndex = 0;
+				$("#selectToolbar").show();
+			}
+			
+			function playSong() {
+				if(searchResults.length > 0) {
+					current_song = searchResults.shift();
+					$(".currentSongName").html(current_song.title);
+					//Play the song in yt
+				}else {
+					$(".currentSongName").html("No more search results.");
+					current_song = {};
+				}
+			}			
+			
+			function addSong() {
+				$("#selectToolbar").hide();
+				$("#saveBar").show();
+				var h = '<li class="pitem"><div class="handle icon"></div><span class="title">' + current_song.title + '</span>' +  
+				'<div class="data">' + JSON.stringify(current_song)  + '</div><div class="trash icon"></div></li>';
+				$("#plist").append(h);
+				searchResults = [];
+				current_song = {};
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</script>
+	
+	</body>
+	
+</html>

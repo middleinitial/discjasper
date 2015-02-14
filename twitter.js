@@ -48,14 +48,14 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('add_song_to_start', function(data) {
-    ytSearch(data.q, function (r) {
+    ytSearch(data.q, 1, function (r) {
       requested_list.unshift(r);
       sendLoadPlaylist();
     });
   });
 
   socket.on('add_song_to_end', function(data) {
-    ytSearch(data.q, function (r) {
+    ytSearch(data.q, 1, function (r) {
       requested_list.push(r);
       sendLoadPlaylist();
     });
@@ -74,8 +74,18 @@ io.sockets.on('connection', function (socket) {
     setShuffle();
   });
   
+  socket.on('searchTopFive', function(data) {
+	ytSearch(data.q, 5, function(r){
+		returnSearchFiveResults(r);
+	}); 
+  });
+
   
 });
+
+function returnSearchFiveResults(r){
+	io.sockets.emit('searchTopFiveResults', r); 
+}
 
 function setShuffle() {
   if(shuffle){ shuffle = false; }
@@ -127,7 +137,7 @@ stream.on('tweet', function(tweet) {
     var removeName = RegExp("@"+config.twitter_account, 'gi');
     var songName = tweet.text.replace(removeName, "");
     console.log(songName);
-    ytSearch(songName, function (r) {
+    ytSearch(songName, 1, function (r) {
       requested_list.push(r);
       sendLoadPlaylist();
     });
@@ -156,7 +166,7 @@ function billboardDefault() {
       var stream = this, item;
       while (item = stream.read()){
         var songName = item["rss:chart_item_title"]["#"] + " " + item["rss:artist"]["#"];
-        ytSearch(songName, function (r) {
+        ytSearch(songName, 1, function (r) {
           default_list.push(r);
           sendLoadPlaylist();
         });
@@ -165,18 +175,18 @@ function billboardDefault() {
   });
 }
 
-function ytSearch(songName, dataFun) {
+function ytSearch(songName, numResults, dataFun) {
   songName = songName.split(" ").join("+");
-  http.get('http://gdata.youtube.com/feeds/api/videos?q=' + songName  + '&max-results=1&v=2', function (res) {
+  http.get('http://gdata.youtube.com/feeds/api/videos?q=' + songName  + '&max-results=' +numResults +'&v=2', function (res) {
     res.pipe(new FeedParser({})).on('readable', function(){
       var stream = this, item;
-      while (item = stream.read()){
-        var vID = item.guid.substr(item.guid.lastIndexOf(":") + 1);
-        var vTime = item['media:group']['yt:duration']['@'].seconds;
-        var vTitle = item['media:group']['media:title']['#'];
-        var val = ({id: vID, time: vTime, title:vTitle});
-        dataFun(val);
-      }
+	  while (item = stream.read()){
+			var vID =  item['media:group']['yt:videoid']['#'];
+			var vTime = item['media:group']['yt:duration']['@'].seconds;
+			var vTitle = item['media:group']['media:title']['#'];
+			val = ({id: vID, time: vTime, title:vTitle});
+		    dataFun(val);
+	  }
     });
   });
 }
